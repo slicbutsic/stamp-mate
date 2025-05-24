@@ -10,9 +10,35 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_05_24_030615) do
+ActiveRecord::Schema[7.1].define(version: 2025_05_24_031233) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "companies", force: :cascade do |t|
+    t.string "name"
+    t.string "market"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "stamps", force: :cascade do |t|
+    t.string "description"
+    t.string "claim_code"
+    t.bigint "company_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_stamps_on_company_id"
+  end
+
+  create_table "user_stamps", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "stamp_id", null: false
+    t.integer "count"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["stamp_id"], name: "index_user_stamps_on_stamp_id"
+    t.index ["user_id"], name: "index_user_stamps_on_user_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -24,8 +50,15 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_24_030615) do
     t.datetime "updated_at", null: false
     t.string "first_name"
     t.string "last_name"
+    t.string "role"
+    t.bigint "company_id", null: false
+    t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "stamps", "companies"
+  add_foreign_key "user_stamps", "stamps"
+  add_foreign_key "user_stamps", "users"
+  add_foreign_key "users", "companies"
 end
